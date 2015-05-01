@@ -1,3 +1,4 @@
+import sys
 import textwrap
 
 import requests
@@ -22,7 +23,8 @@ def lxmlize(path):
 
 def page_to_jargon(page):
     doc = lxmlize(page)
-    article ,= doc.xpath("//h1/text()")
+    article ,= doc.xpath("//h1")
+    article = article.text_content()
     lines = ":{}:\n".format(article) + "\n\n".join([
         pretty(x.text_content().strip()) for x in
         doc.xpath("//h1/following-sibling::p[following::hr]")
@@ -33,6 +35,10 @@ def page_to_jargon(page):
 def iterpages(page):
     doc = lxmlize(page)
     for href in doc.xpath("//a[contains(@href, '//HTML/')]/@href"):
+        sys.stderr.write(href)
+        sys.stderr.write("\n")
+        sys.stderr.flush()
+
         yield page_to_jargon(href)
 
 
